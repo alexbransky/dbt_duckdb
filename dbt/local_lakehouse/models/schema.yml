@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Cleaned customer records (silver layer)."
+    columns:
+      - name: customer_id
+        tests: [not_null, unique]
+      - name: email
+        tests: [not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['active', 'inactive']
+
+  - name: stg_products
+    description: "Cleaned products catalog."
+    columns:
+      - name: product_id
+        tests: [not_null, unique]
+
+  - name: stg_orders
+    description: "Cleaned orders with a derived order_date."
+    columns:
+      - name: order_id
+        tests: [not_null, unique]
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['completed', 'cancelled', 'returned']
+
+  - name: stg_order_items
+    description: "Cleaned order line-items."
+    columns:
+      - name: order_item_id
+        tests: [not_null, unique]
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_orders')
+                field: order_id
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+
+  - name: fct_pageviews_daily
+    description: "Daily aggregated pageviews (incremental)."
+    columns:
+      - name: day
+        tests: [not_null, unique]
+
+  - name: mart_daily_kpis
+    description: "Daily KPI mart: revenue, orders, pageviews."
+    columns:
+      - name: day
+        tests: [not_null, unique]

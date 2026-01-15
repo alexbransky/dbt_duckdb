@@ -1,0 +1,12 @@
+local_lakehouse:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', 'duckdb/warehouse.duckdb') }}"
+      threads: 4
+      extensions:
+        - httpfs
+        - parquet
+        - json
+

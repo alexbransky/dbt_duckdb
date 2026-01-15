@@ -1,0 +1,36 @@
+name: local_lakehouse
+version: "0.1.0"
+config-version: 2
+
+profile: local_lakehouse
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+vars:
+  raw_dir: "data/raw"
+
+models:
+  local_lakehouse:
+    +materialized: view
+    bronze:
+      +materialized: table
+      +schema: bronze
+    staging:
+      +schema: staging
+    intermediate:
+      +schema: intermediate
+    marts:
+      +schema: marts
+
+snapshots:
+  local_lakehouse:
+    +target_schema: snapshots
